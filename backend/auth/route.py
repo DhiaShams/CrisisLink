@@ -1,6 +1,8 @@
 from flask import Blueprint, request, jsonify
 from models.db import users_collection
 import bcrypt
+from ai.input_agent import extract_input_info
+
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -53,3 +55,19 @@ def login():
         return jsonify({'error': 'Invalid email or password'}), 401
 
     return jsonify({'message': 'Login successful'}), 200
+
+@auth_bp.route('/ai/extract', methods=['POST'] )
+def extract_info():
+    data=request.get_json()
+    message = data.get('message')
+
+    if not message:
+        return jsonify({'error':'Missing message'}), 400
+    try:
+        result= extract_input_info(message)
+        return jsonify({'result': result}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+
