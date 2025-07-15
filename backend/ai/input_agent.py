@@ -33,9 +33,9 @@ Respond with only a valid JSON object.
 
         # Remove Markdown code block if present
         if content.startswith("```"):
-            content = content.strip("`").strip()  # remove all backticks
+            content = content.split("```")[1].strip()
             if content.lower().startswith("json"):
-                content = content[len("json"):].strip()  # remove 'json' prefix
+                content = content[len("json"):].strip()
 
         return json.loads(content)
     except Exception as e:
