@@ -55,5 +55,11 @@ class TestExtractInputInfo(unittest.TestCase):
         result = input_agent.extract_input_info(msg)
         self.assertEqual(result, {})  # Should gracefully fallback to empty dict
 
+        result = extract_input_info(message)
+
+
 if __name__ == "__main__":
     unittest.main()
+
+if result:
+    save_to_db(result)
