@@ -1,8 +1,9 @@
-from pymongo import MongoClient
+from flask_sqlalchemy import SQLAlchemy
+from flask import Flask
 
+db= SQLAlchemy()
 
-MONGO_URI = "mongodb://localhost:27017" # Replace with your MongoDB URI (local or Atlas)
-
-client = MongoClient(MONGO_URI)
-db = client["crisislink_db"]  # Change the DB name as needed
-users_collection = db["users"] 
+def init_app(app):
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://username:password@localhost:5432/crisislink_db'
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    db.init_app(app)
