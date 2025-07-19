@@ -52,46 +52,67 @@ const CrisisSignup = () => {
     }
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const newErrors = {};
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+  const newErrors = {};
 
-    const fname = document.getElementById("fname").value.trim();
-    const lname = document.getElementById("lname").value.trim();
-    const phone = document.getElementById("phone").value.trim();
-    const dob = document.getElementById("dob").value;
-    const termsChecked = document.getElementById("terms").checked;
+  const fname = document.getElementById("fname").value.trim();
+  const lname = document.getElementById("lname").value.trim();
+  const phone = document.getElementById("phone").value.trim();
+  const dob = document.getElementById("dob").value;
+  const termsChecked = document.getElementById("terms").checked;
 
-    // Only alphabets validation for first and last name
-    if (!fname) newErrors.fname = "First name is required.";
-    else if (!/^[A-Za-z]+$/.test(fname)) newErrors.fname = "First name must contain only alphabets.";
+  if (!fname) newErrors.fname = "First name is required.";
+  else if (!/^[A-Za-z]+$/.test(fname)) newErrors.fname = "First name must contain only alphabets.";
 
-    if (!lname) newErrors.lname = "Last name is required.";
-    else if (!/^[A-Za-z]+$/.test(lname)) newErrors.lname = "Last name must contain only alphabets.";
+  if (!lname) newErrors.lname = "Last name is required.";
+  else if (!/^[A-Za-z]+$/.test(lname)) newErrors.lname = "Last name must contain only alphabets.";
 
-    if (!email.includes("@")) newErrors.email = "Enter a valid email.";
-    if (!/^[0-9]{10}$/.test(phone)) newErrors.phone = "Enter a valid 10-digit number.";
-    if (!dob) newErrors.dob = "Date of birth is required.";
-    if (password.length < 6) newErrors.password = "Password must be at least 6 characters.";
-    if (password !== confirmPassword) newErrors.confirmPassword = "Passwords do not match.";
-    if (!gender) newErrors.gender = "Gender is required.";
-    if (!selectedState) newErrors.state = "Please select a state.";
-    if (!selectedDistrict) newErrors.district = "Please select a district.";
-    if (!selectedCity) newErrors.city = "Please select a city.";
-    if (!termsChecked) newErrors.terms = "You must agree to the Terms and Conditions.";
+  if (!email.includes("@")) newErrors.email = "Enter a valid email.";
+  if (!/^[0-9]{10}$/.test(phone)) newErrors.phone = "Enter a valid 10-digit number.";
+  if (!dob) newErrors.dob = "Date of birth is required.";
+  if (password.length < 6) newErrors.password = "Password must be at least 6 characters.";
+  if (password !== confirmPassword) newErrors.confirmPassword = "Passwords do not match.";
+  if (!gender) newErrors.gender = "Gender is required.";
+  if (!selectedState) newErrors.state = "Please select a state.";
+  if (!selectedDistrict) newErrors.district = "Please select a district.";
+  if (!selectedCity) newErrors.city = "Please select a city.";
+  if (!termsChecked) newErrors.terms = "You must agree to the Terms and Conditions.";
 
-    // Password mismatch validation (in addition to above)
-    if (password && confirmPassword && password !== confirmPassword) {
-      newErrors.password = "Passwords do not match.";
-      newErrors.confirmPassword = "Passwords do not match.";
+  setErrors(newErrors);
+
+  if (Object.keys(newErrors).length === 0) {
+    // If all validations pass, send data to backend
+    try {
+      const response = await fetch("http://localhost:5000/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          name: fname + " " + lname,  // combine first and last name
+          email,
+          password
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        alert(data.error || "Signup failed.");
+      } else {
+        alert("Signup successful!");
+        // Optionally redirect to login
+        window.location.href = "/";
+      }
+
+    } catch (error) {
+      console.error("Signup failed:", error);
+      alert("Something went wrong. Please try again.");
     }
+  }
+};
 
-    setErrors(newErrors);
-
-    if (Object.keys(newErrors).length === 0) {
-      console.log("Form submitted successfully!");
-    }
-  };
 
   const maxDOB = new Date().toISOString().split("T")[0];
 
