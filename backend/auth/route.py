@@ -19,6 +19,9 @@ def signup():
     if not name or not email or not password:
         return jsonify({'error': 'Missing fields'}), 400
 
+    if len(password) < 6:
+        return jsonify({'error': 'Password too short'}), 400
+
     
     if User.query.filter_by(email=email).first():
         return jsonify({'error': 'Email already registered'}), 409
@@ -26,7 +29,7 @@ def signup():
    
     hashed_pw = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
-    user=User(name=name, email=email, password=hashed_pw)
+    user = User(name=name, email=email, password_hash=hashed_pw)
     db.session.add(user)
     db.session.commit()
 
@@ -45,13 +48,19 @@ def login():
 
     user=User.query.filter_by(email=email).first()
 
-    if not user or not bcrypt.checkpw(password.encode('utf-8'), user.password):
+    if not user or not bcrypt.checkpw(password.encode('utf-8'), user.password_hash):
         return jsonify({'error': 'Invalid email or password'}), 401
 
-   
-    
 
-    return jsonify({'message': 'Login successful'}), 200
+    return jsonify({
+    'message': 'Login successful',
+    'user': {
+        'id': user.id,
+        'name': user.name,
+        'email': user.email
+    }
+}), 200
+
 
 @auth_bp.route('/ai/extract', methods=['POST'] )
 def extract_info():
@@ -65,6 +74,8 @@ def extract_info():
         return jsonify({'result': result}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+
 
 
 

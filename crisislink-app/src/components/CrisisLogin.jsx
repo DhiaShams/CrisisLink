@@ -4,6 +4,8 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./CrisisLogin.css";
 import eye from "../assets/eye.png";
 import eyeCrossed from "../assets/eye-crossed.png";
+import axios from "axios";
+
 
 const CrisisLogin = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -23,9 +25,23 @@ const CrisisLogin = () => {
     setErrors(newErrors);
 
     if (Object.keys(newErrors).length === 0) {
-      // Handle login logic here
-      console.log("Login successful!");
+      axios.post("http://localhost:5000/login", {
+        email,
+        password,
+      })
+        .then((res) => {
+          console.log("Login success:", res.data);
+          // You can save token if any, then redirect or show message
+        })
+        .catch((err) => {
+          if (err.response && err.response.data) {
+            alert(err.response.data.message || "Login failed");
+          } else {
+            alert("Server error");
+          }
+        });
     }
+
   };
 
   return (

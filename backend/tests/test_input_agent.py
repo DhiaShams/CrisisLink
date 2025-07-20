@@ -55,5 +55,6 @@ class TestExtractInputInfo(unittest.TestCase):
         result = input_agent.extract_input_info(msg)
         self.assertEqual(result, {})  # Should gracefully fallback to empty dict
 
+
 if __name__ == "__main__":
     unittest.main()

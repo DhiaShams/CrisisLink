@@ -2,6 +2,7 @@ import os
 from dotenv import load_dotenv
 import google.generativeai as genai
 
+from models.postgres_db import get_pg_connection
 import json
 
 # Load your Gemini API key from .env
@@ -32,9 +33,9 @@ Respond with only a valid JSON object.
 
         # Remove Markdown code block if present
         if content.startswith("```"):
-            content = content.strip("`").strip()  # remove all backticks
+            content = content.split("```")[1].strip()
             if content.lower().startswith("json"):
-                content = content[len("json"):].strip()  # remove 'json' prefix
+                content = content[len("json"):].strip()
 
         return json.loads(content)
     except Exception as e:
@@ -42,6 +43,22 @@ Respond with only a valid JSON object.
         print("Raw response:", response)
         return {}
 
+def save_to_db(data):
+    try:
+        conn = get_pg_connection()
+        cur = conn.cursor()
+        cur.execute("""
+            INSERT INTO input_requests (user_type, location, category, description)
+            VALUES (%s, %s, %s, %s)
+        """, (data['user_type'], data['location'], data['category'], data['description']))
+        conn.commit()
+    except Exception as e:
+        print("❌ DB Error:", e)
+    finally:
+        if 'cur' in locals():
+            cur.close()
+        if 'conn' in locals():
+            conn.close()
 
 
 # 🧪 Test
