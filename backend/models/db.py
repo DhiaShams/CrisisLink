@@ -1,5 +1,3 @@
-# db.py
-
 from flask_sqlalchemy import SQLAlchemy
 from flask import Flask
 import psycopg2
@@ -12,13 +10,12 @@ load_dotenv()
 # SQLAlchemy instance
 db = SQLAlchemy()
 
-def init_app(app: Flask):
-    """
-    Initializes the Flask app with SQLAlchemy configuration.
-    """
-    app.config['SQLALCHEMY_DATABASE_URI'] = f"postgresql://{os.getenv('POSTGRES_USER')}:{os.getenv('POSTGRES_PASSWORD')}@{os.getenv('POSTGRES_HOST')}:{os.getenv('POSTGRES_PORT', 5432)}/{os.getenv('POSTGRES_DB')}"
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+def init_app(app):
+    app.config['SQLALCHEMY_DATABASE_URI'] = (
+        f"postgresql://crisislink_user:{os.getenv('DB_PASSWORD')}@localhost:5432/crisislink_db"
+    )
     db.init_app(app)
+
 
 def get_db_connection():
     """

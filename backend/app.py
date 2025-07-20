@@ -1,19 +1,17 @@
-from flask import Flask
-from flask_cors import CORS
-from models.db import init_app, db
-from auth.route import auth_bp  # Blueprint for authentication-related routes
+from fastapi import FastAPI, Request
+from pydantic import BaseModel
+from ai.input_agent import extract_input_info, save_to_db
 
-app = Flask(__name__)
-CORS(app)  # Enable Cross-Origin Resource Sharing for frontend-backend communication
+app = FastAPI()
 
-# Initialize database configuration and SQLAlchemy
-init_app(app)
+class InputMessage(BaseModel):
+    message: str
 
-# Register authentication blueprint
-app.register_blueprint(auth_bp, url_prefix="/")
+@app.post("/process-message/")
+def process_message(input: InputMessage):
+    structured_data = extract_input_info(input.message)
+    if not structured_data:
+        return {"status": "error", "message": "Could not parse input."}
 
-if __name__ == "__main__":
-    with app.app_context():
-        db.create_all()  # Create tables if they don't exist
-    
-    app.run(debug=True)  # Start Flask server in debug mode
+    save_to_db(structured_data)
+    return {"status": "success", "data": structured_data}

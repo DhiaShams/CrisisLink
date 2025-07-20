@@ -43,18 +43,22 @@ Respond with only a valid JSON object.
         print("Raw response:", response)
         return {}
 
-
 def save_to_db(data):
-    conn = get_pg_connection()
-    cur = conn.cursor()
-    cur.execute("""
-        INSERT INTO input_requests (user_type, location, category, description)
-        VALUES (%s, %s, %s, %s)
-    """, (data['user_type'], data['location'], data['category'], data['description']))
-    conn.commit()
-    cur.close()
-    conn.close()
-
+    try:
+        conn = get_pg_connection()
+        cur = conn.cursor()
+        cur.execute("""
+            INSERT INTO input_requests (user_type, location, category, description)
+            VALUES (%s, %s, %s, %s)
+        """, (data['user_type'], data['location'], data['category'], data['description']))
+        conn.commit()
+    except Exception as e:
+        print("❌ DB Error:", e)
+    finally:
+        if 'cur' in locals():
+            cur.close()
+        if 'conn' in locals():
+            conn.close()
 
 
 # 🧪 Test

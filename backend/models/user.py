@@ -6,5 +6,3 @@ class User(db.Model):
     name= db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash= db.Column(db.LargeBinary,nullable=False)
-
-   
